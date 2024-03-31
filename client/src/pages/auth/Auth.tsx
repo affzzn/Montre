@@ -90,7 +90,7 @@ const Login = () => {
       console.log(error);
 
       let errorMsg: string = "";
-      switch (error.response.data.type) {
+      switch (error?.response?.data?.type) {
         case USER_ERRORS.USER_NOT_FOUND:
           errorMsg = "User not found";
           break;
