@@ -1,5 +1,6 @@
 import { useGetProducts } from "../../hooks/useGetProducts";
-// import Product from "./Product";
+import Product from "./Product";
+import "./Shop.css";
 
 function Shop() {
   const { products } = useGetProducts();
@@ -8,9 +9,7 @@ function Shop() {
     <div className="shop">
       <div className="products">
         {products.map((p) => (
-          <div>
-            {p.productName} {p.price}
-          </div>
+          <Product key={p._id} product={p} />
         ))}
       </div>
     </div>
