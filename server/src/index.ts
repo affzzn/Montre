@@ -13,7 +13,7 @@ app.use(cors())
 
 
 app.use('/user', userRouter)
-app.use('/product', productRouter)
+app.use('/products', productRouter)
 
 mongoose.connect("mongodb+srv://affan1708:ecommercePassword@ecommerce.y93cjct.mongodb.net/ecommerce")
 
