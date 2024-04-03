@@ -1,15 +1,17 @@
 import { createContext, useState } from "react";
 
-interface IShopContext {
+export interface IShopContext {
   addToCart: (itemId: string) => void;
   removeFromCart: (itemId: string) => void;
   updateItemCount: (newAmount: number, itemId: string) => void;
+  getCartItemCount: (itemId: string) => number;
 }
 
 const defaultVal: IShopContext = {
   addToCart: () => null,
   removeFromCart: () => null,
   updateItemCount: () => null,
+  getCartItemCount: () => 0,
 };
 
 export const ShopContext = createContext<IShopContext>(defaultVal);
@@ -17,13 +19,31 @@ export const ShopContext = createContext<IShopContext>(defaultVal);
 export const ShopContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState<{ string: number } | {}>({});
 
-  const addToCart = (itemId: string) => {};
+  const getCartItemCount = (itemId: string): number => {
+    if (itemId in cartItems) {
+      return cartItems[itemId];
+    }
+    return 0;
+  };
+
+  const addToCart = (itemId: string) => {
+    if (!cartItems[itemId]) {
+      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
+    } else {
+      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
+    }
+  };
 
   const removeFromCart = (itemId: string) => {};
 
   const updateItemCount = (newAmount: number, itemId: string) => {};
 
-  const contextVal: IShopContext = {};
+  const contextVal: IShopContext = {
+    addToCart,
+    removeFromCart,
+    updateItemCount,
+    getCartItemCount,
+  };
   return (
     <ShopContext.Provider value={contextVal}>{children}</ShopContext.Provider>
   );
