@@ -23,6 +23,8 @@ export const ShopContext = createContext<IShopContext>(defaultVal);
 export const ShopContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState<{ string: number } | {}>({});
 
+  const { products } = useGetProducts();
+
   const getCartItemCount = (itemId: string): number => {
     if (itemId in cartItems) {
       return cartItems[itemId];
@@ -52,15 +54,15 @@ export const ShopContextProvider = ({ children }) => {
   };
 
   const getTotalCartAmount = (): number => {
-    const { products } = useGetProducts();
+    // const { products } = useGetProducts();
     let totalAmount = 0;
 
     for (const i in cartItems) {
       if (cartItems[i] > 0) {
         let itemInfo: IProduct = products.find((p) => p._id === i);
 
-        // totalAmount += itemInfo.price * cartItems[i];
-        return (totalAmount = 100);
+        totalAmount += cartItems[i] * itemInfo.price;
+        // return (totalAmount = 100);
       }
     }
 
