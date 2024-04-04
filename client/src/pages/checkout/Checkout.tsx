@@ -4,12 +4,14 @@ import { IProduct } from "../../models/interfaces";
 import { IShopContext, ShopContext } from "../../contexts/shopContext";
 import CartItem from "./CartItem";
 import "./Checkout.css";
+import { useNavigate } from "react-router-dom";
 
 function Checkout() {
-  const { getCartItemCount, getTotalCartAmount } =
+  const { getCartItemCount, getTotalCartAmount, checkout } =
     useContext<IShopContext>(ShopContext);
 
   const { products } = useGetProducts();
+  const navigate = useNavigate();
 
   const totalAmount = getTotalCartAmount();
   return (
@@ -21,16 +23,18 @@ function Checkout() {
         {products.map((p: IProduct) => {
           if (getCartItemCount(p._id) > 0) {
             return <CartItem product={p} key={p._id} />;
-          } else {
-            <h2>Your Cart is Empty</h2>;
           }
         })}
       </div>
-      <div className="checkout">
-        <p>Subtotal: ${totalAmount}</p>
-        <button>Continue Shopping</button>
-        <button>Checkout</button>
-      </div>
+      {totalAmount > 0 ? (
+        <div className="checkout">
+          <p>Subtotal: ${totalAmount.toFixed(2)}</p>
+          <button onClick={() => navigate("/")}>Continue Shopping</button>
+          <button onClick={checkout}>Checkout</button>
+        </div>
+      ) : (
+        <p>Your Cart is Empty</p>
+      )}
     </div>
   );
 }
