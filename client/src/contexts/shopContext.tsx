@@ -1,10 +1,13 @@
 import { createContext, useState } from "react";
+import { IProduct } from "../models/interfaces";
+import { useGetProducts } from "../hooks/useGetProducts";
 
 export interface IShopContext {
   addToCart: (itemId: string) => void;
   removeFromCart: (itemId: string) => void;
   updateItemCount: (newAmount: number, itemId: string) => void;
   getCartItemCount: (itemId: string) => number;
+  getTotalCartAmount: () => number;
 }
 
 const defaultVal: IShopContext = {
@@ -12,6 +15,7 @@ const defaultVal: IShopContext = {
   removeFromCart: () => null,
   updateItemCount: () => null,
   getCartItemCount: () => 0,
+  getTotalCartAmount: () => 0,
 };
 
 export const ShopContext = createContext<IShopContext>(defaultVal);
@@ -34,15 +38,41 @@ export const ShopContextProvider = ({ children }) => {
     }
   };
 
-  const removeFromCart = (itemId: string) => {};
+  const removeFromCart = (itemId: string) => {
+    if (!cartItems[itemId]) return;
+    if (cartItems[itemId] === 0) return;
 
-  const updateItemCount = (newAmount: number, itemId: string) => {};
+    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+  };
+
+  const updateItemCount = (newAmount: number, itemId: string) => {
+    if (newAmount < 0) return;
+
+    setCartItems((prev) => ({ ...prev, [itemId]: newAmount }));
+  };
+
+  const getTotalCartAmount = (): number => {
+    const { products } = useGetProducts();
+    let totalAmount = 0;
+
+    for (const i in cartItems) {
+      if (cartItems[i] > 0) {
+        let itemInfo: IProduct = products.find((p) => p._id === i);
+
+        // totalAmount += itemInfo.price * cartItems[i];
+        return (totalAmount = 100);
+      }
+    }
+
+    return totalAmount;
+  };
 
   const contextVal: IShopContext = {
     addToCart,
     removeFromCart,
     updateItemCount,
     getCartItemCount,
+    getTotalCartAmount,
   };
   return (
     <ShopContext.Provider value={contextVal}>{children}</ShopContext.Provider>
