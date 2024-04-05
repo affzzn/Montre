@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { IProduct } from "../models/interfaces";
 import { useGetProducts } from "../hooks/useGetProducts";
 import axios from "axios";
@@ -11,6 +11,7 @@ export interface IShopContext {
   getCartItemCount: (itemId: string) => number;
   getTotalCartAmount: () => number;
   checkout: () => void;
+  availableMoney: number;
 }
 
 const defaultVal: IShopContext = {
@@ -20,6 +21,7 @@ const defaultVal: IShopContext = {
   getCartItemCount: () => 0,
   getTotalCartAmount: () => 0,
   checkout: () => null,
+  availableMoney: 0,
 };
 
 export const ShopContext = createContext<IShopContext>(defaultVal);
@@ -30,6 +32,22 @@ export const ShopContextProvider = ({ children }) => {
   const { products } = useGetProducts();
 
   const navigate = useNavigate();
+
+  const [availableMoney, setAvailableMoney] = useState<number>(0);
+
+  const fetchAvailableMoney = async () => {
+    try {
+      const result = await axios.get(
+        `http://localhost:3000/user/available-money/${localStorage.getItem(
+          "userID"
+        )}`
+      );
+
+      setAvailableMoney(result.data.availableMoney);
+    } catch (error) {
+      alert("Error fetching available money");
+    }
+  };
 
   const getCartItemCount = (itemId: string): number => {
     if (itemId in cartItems) {
@@ -80,11 +98,17 @@ export const ShopContextProvider = ({ children }) => {
 
     try {
       await axios.post("http://localhost:3000/products/checkout", body);
+      setCartItems({});
+      fetchAvailableMoney();
       navigate("/");
     } catch (error) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    fetchAvailableMoney();
+  });
 
   const contextVal: IShopContext = {
     addToCart,
@@ -93,6 +117,7 @@ export const ShopContextProvider = ({ children }) => {
     getCartItemCount,
     getTotalCartAmount,
     checkout,
+    availableMoney,
   };
   return (
     <ShopContext.Provider value={contextVal}>{children}</ShopContext.Provider>

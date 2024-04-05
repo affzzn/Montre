@@ -69,4 +69,21 @@ router.post('/login', async (req: Request, res: Response) => {
 })
 
 
+router.get('/available-money/:userID', async (req: Request, res: Response) => {
+    const {userID} = req.params
+
+    try {
+        const user = await userModel.findById(userID)
+
+        if(!user){
+            return res.status(400).json({type: USER_ERRORS.USER_NOT_FOUND})
+        }
+
+        res.json({availableMoney: user.availableAmount})
+        
+    } catch (error) {
+        res.status(500).json({type: error})
+    }
+})
+
 export {router as userRouter}
